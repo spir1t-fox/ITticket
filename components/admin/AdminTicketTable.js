@@ -220,7 +220,7 @@ export default function AdminTicketTable() {
                   <option value="open">Open</option>
                   <option value="inprogress">In Progress</option>
                   <option value="onhold">On Hold</option>
-                  
+                  <option value="resolved">Resolved</option>
                 </select>
               </div>
 

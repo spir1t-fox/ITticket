@@ -116,7 +116,7 @@ export default function AdminDashboard() {
                 <div className="text-sm text-gray-600">In Progress</div>
               </div>
             </Card>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer">
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-purple-600">{stats.onHold}</div>
                 <div className="text-sm text-gray-600">On Hold</div>

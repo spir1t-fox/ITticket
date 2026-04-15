@@ -46,7 +46,7 @@ export default function UserTicketList() {
             id: doc.id,
             ...doc.data()
           }))
-          .filter((t) => ['open', 'in-progress', 'inprogress', 'onhold'].includes(t.status))
+          .filter((t) => ['open', 'in-progress'].includes(t.status))
           .sort((a, b) => {
             const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 }
             const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2)
@@ -70,30 +70,10 @@ export default function UserTicketList() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'open': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'in-progress':
-      case 'inprogress': return 'bg-blue-100 text-blue-800 border-blue-200'
-      case 'onhold': return 'bg-purple-100 text-purple-800 border-purple-200'
+      case 'in-progress': return 'bg-blue-100 text-blue-800 border-blue-200'
       case 'resolved': return 'bg-green-100 text-green-800 border-green-200'
       case 'closed': return 'bg-gray-100 text-gray-800 border-gray-200'
       default: return 'bg-gray-100 text-gray-800 border-gray-200'
-    }
-  }
-
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 'inprogress':
-      case 'in-progress':
-        return 'In Progress'
-      case 'onhold':
-        return 'On Hold'
-      case 'open':
-        return 'Open'
-      case 'resolved':
-        return 'Resolved'
-      case 'closed':
-        return 'Closed'
-      default:
-        return status?.replace('-', ' ')?.replace(/\b\w/g, c => c.toUpperCase()) || ''
     }
   }
 
@@ -118,13 +98,7 @@ export default function UserTicketList() {
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter
     
     // Status filter
-    const statusMatches = (ticketStatus, filter) => {
-      if (filter === 'all') return true
-      if (filter === 'in-progress') return ['in-progress', 'inprogress'].includes(ticketStatus)
-      if (filter === 'onhold') return ticketStatus === 'onhold'
-      return ticketStatus === filter
-    }
-    const matchesStatus = statusMatches(ticket.status, statusFilter)
+    const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter
     
     // Date filter
     let matchesDate = true
@@ -194,7 +168,6 @@ export default function UserTicketList() {
                 <option value="all">All Status</option>
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
-                <option value="onhold">On Hold</option>
               </select>
             </div>
 
@@ -297,7 +270,7 @@ export default function UserTicketList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(ticket.status)}`}>
-                        {getStatusLabel(ticket.status)}
+                        {ticket.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

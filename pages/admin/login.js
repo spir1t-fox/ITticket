@@ -21,9 +21,13 @@ export default function AdminLogin() {
     setLoading(true)
 
     try {
-      const user = await login(email, password)
+      await login(email, password)
 
-      if (user.role !== 'admin') {
+      const tokenResult = await auth.currentUser?.getIdTokenResult()
+      const role = tokenResult?.claims?.role || 'user'
+     
+
+      if (role !== 'admin') {
         await logout()
         setError('This account does not have admin access.')
         return
@@ -88,7 +92,7 @@ export default function AdminLogin() {
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 onClick={() => router.push('/login')}
               >
-                User Login
+                Back to User Login
               </button>
             </div>
           </form>

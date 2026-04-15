@@ -151,7 +151,7 @@ export default function AdminHistoryTable() {
               >
                 <option value="all">All Status</option>
                 <option value="resolved">Resolved</option>
-                
+                <option value="closed">Closed</option>
               </select>
             </div>
 
@@ -198,6 +198,9 @@ export default function AdminHistoryTable() {
             <p className="text-gray-500">No resolved or closed tickets found.</p>
           </div>
         ) : (
+          
+          
+          
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -225,6 +228,7 @@ export default function AdminHistoryTable() {
                   </th>
                 </tr>
               </thead>
+              
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredTickets.map((ticket) => (
                   <tr key={ticket.id} className="hover:bg-gray-50">

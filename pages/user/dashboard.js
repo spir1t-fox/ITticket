@@ -98,31 +98,31 @@ export default function UserDashboard() {
 
           {/* Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/user/my-tickets')}>
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
                 <div className="text-sm text-gray-600">Total Tickets</div>
               </div>
             </Card>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/user/my-tickets')}>
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-yellow-600">{stats.open}</div>
                 <div className="text-sm text-gray-600">Open</div>
               </div>
             </Card>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/user/my-tickets')}>
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600">{stats.inProgress}</div>
                 <div className="text-sm text-gray-600">In Progress</div>
               </div>
             </Card>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/user/my-tickets')}>
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-purple-600">{stats.onHold}</div>
                 <div className="text-sm text-gray-600">On Hold</div>
               </div>
             </Card>
-            <Card className="hover:shadow-lg transition-shadow cursor-pointer" >
+            <Card className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => router.push('/user/history')}>
               <div className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-600">{stats.resolved}</div>
                 <div className="text-sm text-gray-600">Resolved</div>

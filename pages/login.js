@@ -21,10 +21,13 @@ export default function Login() {
     setLoading(true)
 
     try {
-      const user = await login(email, password)
+      await login(email, password)
 
       // Check if user is admin - admins should not login via user login
-      if (user.role === 'admin') {
+      const tokenResult = await auth.currentUser?.getIdTokenResult()
+      const role = tokenResult?.claims?.role || 'user'
+
+      if (role === 'admin') {
         await logout()
         setError('Admin accounts must use the admin login page.')
         return
