@@ -14,6 +14,7 @@ export default function UserTicketList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchField, setSearchField] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
@@ -46,7 +47,7 @@ export default function UserTicketList() {
             id: doc.id,
             ...doc.data()
           }))
-          .filter((t) => ['open', 'in-progress'].includes(t.status))
+          .filter((t) => ['open', 'in-progress', 'inprogress', 'onhold'].includes(t.status))
           .sort((a, b) => {
             const priorityOrder = { urgent: 0, high: 1, medium: 2, low: 3 }
             const priorityDiff = (priorityOrder[a.priority] || 2) - (priorityOrder[b.priority] || 2)
@@ -70,10 +71,30 @@ export default function UserTicketList() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'open': return 'bg-yellow-100 text-yellow-800 border-yellow-200'
-      case 'in-progress': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'in-progress':
+      case 'inprogress': return 'bg-blue-100 text-blue-800 border-blue-200'
+      case 'onhold': return 'bg-purple-100 text-purple-800 border-purple-200'
       case 'resolved': return 'bg-green-100 text-green-800 border-green-200'
       case 'closed': return 'bg-gray-100 text-gray-800 border-gray-200'
       default: return 'bg-gray-100 text-gray-800 border-gray-200'
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 'inprogress':
+      case 'in-progress':
+        return 'In Progress'
+      case 'onhold':
+        return 'On Hold'
+      case 'open':
+        return 'Open'
+      case 'resolved':
+        return 'Resolved'
+      case 'closed':
+        return 'Closed'
+      default:
+        return status?.replace('-', ' ')?.replace(/\b\w/g, c => c.toUpperCase()) || ''
     }
   }
 
@@ -88,17 +109,33 @@ export default function UserTicketList() {
   }
 
   const filteredTickets = tickets.filter(ticket => {
-    // Search filter
-    const matchesSearch = 
-      ticket.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.subcategory?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    // Search filter based on selected field
+    let matchesSearch = true
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      if (searchField === 'title') {
+        matchesSearch = ticket.title?.toLowerCase().includes(searchLower)
+      } else if (searchField === 'category') {
+        matchesSearch = ticket.category?.toLowerCase().includes(searchLower) || ticket.subcategory?.toLowerCase().includes(searchLower)
+      } else if (searchField === 'all') {
+        matchesSearch = 
+          ticket.title?.toLowerCase().includes(searchLower) ||
+          ticket.subcategory?.toLowerCase().includes(searchLower) ||
+          ticket.category?.toLowerCase().includes(searchLower)
+      }
+    }
     
     // Priority filter
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter
     
     // Status filter
-    const matchesStatus = statusFilter === 'all' || ticket.status === statusFilter
+    const statusMatches = (ticketStatus, filter) => {
+      if (filter === 'all') return true
+      if (filter === 'in-progress') return ['in-progress', 'inprogress'].includes(ticketStatus)
+      if (filter === 'onhold') return ticketStatus === 'onhold'
+      return ticketStatus === filter
+    }
+    const matchesStatus = statusMatches(ticket.status, statusFilter)
     
     // Date filter
     let matchesDate = true
@@ -128,13 +165,27 @@ export default function UserTicketList() {
 
         {/* Filters Bar */}
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            {/* Search Field Selection */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Search By</label>
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Fields</option>
+                <option value="title">Title</option>
+                <option value="category">Category</option>
+              </select>
+            </div>
+
             {/* Search */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Search</label>
               <input
                 type="text"
-                placeholder="Search tickets..."
+                placeholder="Enter search term..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -168,6 +219,7 @@ export default function UserTicketList() {
                 <option value="all">All Status</option>
                 <option value="open">Open</option>
                 <option value="in-progress">In Progress</option>
+                <option value="onhold">On Hold</option>
               </select>
             </div>
 
@@ -188,10 +240,12 @@ export default function UserTicketList() {
             </div>
 
             {/* Clear Filters */}
-            <div className="flex items-end">
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1 invisible">Clear</label>
               <button
                 onClick={() => {
                   setSearchTerm('')
+                  setSearchField('all')
                   setPriorityFilter('all')
                   setStatusFilter('all')
                   setDateFilter('all')
@@ -270,7 +324,7 @@ export default function UserTicketList() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(ticket.status)}`}>
-                        {ticket.status}
+                        {getStatusLabel(ticket.status)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

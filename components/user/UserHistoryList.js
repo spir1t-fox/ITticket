@@ -14,6 +14,7 @@ export default function UserHistoryList() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchField, setSearchField] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
@@ -87,11 +88,21 @@ export default function UserHistoryList() {
   }
 
   const filteredTickets = tickets.filter(ticket => {
-    // Search filter
-    const matchesSearch = 
-      ticket.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.subcategory?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      ticket.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    // Search filter based on selected field
+    let matchesSearch = true
+    if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase()
+      if (searchField === 'title') {
+        matchesSearch = ticket.title?.toLowerCase().includes(searchLower)
+      } else if (searchField === 'category') {
+        matchesSearch = ticket.category?.toLowerCase().includes(searchLower) || ticket.subcategory?.toLowerCase().includes(searchLower)
+      } else if (searchField === 'all') {
+        matchesSearch = 
+          ticket.title?.toLowerCase().includes(searchLower) ||
+          ticket.subcategory?.toLowerCase().includes(searchLower) ||
+          ticket.category?.toLowerCase().includes(searchLower)
+      }
+    }
     
     // Priority filter
     const matchesPriority = priorityFilter === 'all' || ticket.priority === priorityFilter
@@ -127,13 +138,27 @@ export default function UserHistoryList() {
 
         {/* Filters Bar */}
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            {/* Search Field Selection */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Search By</label>
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Fields</option>
+                <option value="title">Title</option>
+                <option value="category">Category</option>
+              </select>
+            </div>
+
             {/* Search */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Search</label>
               <input
                 type="text"
-                placeholder="Search tickets..."
+                placeholder="Enter search term..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -191,6 +216,7 @@ export default function UserHistoryList() {
               <button
                 onClick={() => {
                   setSearchTerm('')
+                  setSearchField('all')
                   setPriorityFilter('all')
                   setStatusFilter('all')
                   setDateFilter('all')

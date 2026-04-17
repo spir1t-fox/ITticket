@@ -92,7 +92,7 @@ export default function AdminLogin() {
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
                 onClick={() => router.push('/login')}
               >
-                Back to User Login
+                 User Login
               </button>
             </div>
           </form>

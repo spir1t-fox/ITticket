@@ -10,6 +10,7 @@ export default function AdminHistoryTable() {
   const [filteredTickets, setFilteredTickets] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [searchField, setSearchField] = useState('all')
   const [priorityFilter, setPriorityFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
   const [dateFilter, setDateFilter] = useState('all')
@@ -40,15 +41,25 @@ export default function AdminHistoryTable() {
   useEffect(() => {
     let filtered = tickets
 
-    // Search filter
+    // Search filter based on selected field
     if (searchTerm) {
-      filtered = filtered.filter(ticket =>
-        ticket.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.subcategory?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        ticket.userEmail?.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      const searchLower = searchTerm.toLowerCase()
+      filtered = filtered.filter(ticket => {
+        if (searchField === 'title') {
+          return ticket.title?.toLowerCase().includes(searchLower)
+        } else if (searchField === 'user') {
+          return ticket.userName?.toLowerCase().includes(searchLower) || ticket.userEmail?.toLowerCase().includes(searchLower)
+        } else if (searchField === 'category') {
+          return ticket.category?.toLowerCase().includes(searchLower) || ticket.subcategory?.toLowerCase().includes(searchLower)
+        } else if (searchField === 'all') {
+          return ticket.title?.toLowerCase().includes(searchLower) ||
+            ticket.subcategory?.toLowerCase().includes(searchLower) ||
+            ticket.category?.toLowerCase().includes(searchLower) ||
+            ticket.userName?.toLowerCase().includes(searchLower) ||
+            ticket.userEmail?.toLowerCase().includes(searchLower)
+        }
+        return true
+      })
     }
 
     // Priority filter
@@ -73,7 +84,7 @@ export default function AdminHistoryTable() {
     }
 
     setFilteredTickets(filtered)
-  }, [searchTerm, priorityFilter, statusFilter, dateFilter, tickets])
+  }, [searchTerm, searchField, priorityFilter, statusFilter, dateFilter, tickets])
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -112,13 +123,28 @@ export default function AdminHistoryTable() {
 
         {/* Filters Bar */}
         <div className="bg-gray-50 p-4 rounded-lg mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+            {/* Search Field Selection */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">Search By</label>
+              <select
+                value={searchField}
+                onChange={(e) => setSearchField(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="all">All Fields</option>
+                <option value="title">Title</option>
+                <option value="user">User</option>
+                <option value="category">Category</option>
+              </select>
+            </div>
+
             {/* Search */}
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Search</label>
               <input
                 type="text"
-                placeholder="Search tickets..."
+                placeholder="Enter search term..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,6 +202,7 @@ export default function AdminHistoryTable() {
               <button
                 onClick={() => {
                   setSearchTerm('')
+                  setSearchField('all')
                   setPriorityFilter('all')
                   setStatusFilter('all')
                   setDateFilter('all')

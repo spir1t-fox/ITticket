@@ -7,9 +7,11 @@ import Card from '../common/Card'
 import Input from '../common/Input'
 import Button from '../common/Button'
 import Toast from '../common/Toast'
+import { useRouter } from 'next/router'
 
 export default function RaiseTicketForm() {
   const { user } = useAuth()
+  const router = useRouter()
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -77,6 +79,11 @@ export default function RaiseTicketForm() {
         category: '',
         subcategory: ''
       })
+
+      // Redirect to my tickets page after a short delay to show the toast
+      setTimeout(() => {
+        router.push('/user/my-tickets')
+      }, 1500)
 
     } catch (error) {
       setToastMessage('Failed to raise ticket. Please try again.')
