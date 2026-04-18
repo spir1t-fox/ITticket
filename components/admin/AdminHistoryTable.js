@@ -251,7 +251,7 @@ export default function AdminHistoryTable() {
                     Created Date
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Resolved/Closed
+                    Resolved Date
                   </th>
                 </tr>
               </thead>
